@@ -1,0 +1,5 @@
+gold <- read.csv(file="~/Research/2016/NickyHendricks/Goldindec/sample_test/sample_data.csv", header=T, sep=",")
+#gold <- read.csv(file="~/Research/2016/NickyHendricks/Goldindec/Albite_corrected_data.csv", header=T, sep=",")
+plot(gold$Wavenumber, gold$Raw, ylim=range(c(0,50000)), col="red", xlab="Wavenumber", ylab="Intensity")
+par(new=TRUE)
+plot(gold$WaveNumber, gold$Corrected, ylim=range(c(0,50000)), col="green",  xlab="Wavenumber", ylab="Intensity")
