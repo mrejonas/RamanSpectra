@@ -1,6 +1,10 @@
 #!/usr/bin/perl -w
-$qsub_bash = "#!/bin/bash\n" ;
 
+
+# This script is modified for batch processing of Raman Spectra on a
+# compute cluster environment
+# TORQUE queue directive lines
+$qsub_bash = "#!/bin/bash\n" ;
 $qsub_directive = <<'END_DIRECTIVE';
 #PBS -S /bin/bash
 #PBS -q UCTlong
@@ -43,7 +47,8 @@ foreach $prnfile(@ARGV){
   close(TRIMMEDTXT);
   close(TXTFILE);
 
-  # Create spectrum-specific Octave/ Matlab script
+  # Create spectrum-specific Octave/ Matlab script to call the modified
+  # GoldindecQsub script
   open(RUNOCTAVE,">$samplename.m");
   print RUNOCTAVE "addpath ./\n",
         "load $trimmedtext\n",
@@ -62,7 +67,7 @@ foreach $prnfile(@ARGV){
       "rm $samplename.csv $trimmedtext $baselineoutfile $txtfilename\n";
 
   close(RUNQSUB);
-  # Submit 
+  # Submit
   system("qsub -d . $samplename.qsub");
   $spectrum_num++;
   if(($spectrum_num % 100) == 0){sleep 300;}
