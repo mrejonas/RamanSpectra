@@ -13,14 +13,14 @@ END_DIRECTIVE
 $spectrum_num = 1;
 foreach $prnfile(@ARGV){
   $prnfilename = $prnfile;
-  $prnfilename =~ s/-/_/g;
-  $prnfilename =~ s/\(/_/g;
-  $prnfilename =~ s/\)/_/g;
-  $prnfilename =~ s/\'/_/g;
-  $prnfilename =~ s/ +/_/g;
-  $prnfilename =~ s/\+/postive/g;
+  #Remove some special characters from filenames
+  $prnfilename =~ s/-/_/g;  $prnfilename =~ s/\(/_/g;
+  $prnfilename =~ s/\)/_/g;  $prnfilename =~ s/\'/_/g;
+  $prnfilename =~ s/ +/_/g;  $prnfilename =~ s/\+/postive/g;
+  # To ensure a filename starts with a string, pre-pend "XY_"
   $prnfilename = "XY_".$prnfilename;
   system("mv $prnfile $prnfilename");
+  # Create different output filenames
   $baselineoutfile = $prnfilename; $baselineoutfile =~ s/\..+$/_baseline\.csv/;
   $txtfilename = $prnfilename; $txtfilename =~ s/\.prn/\.txt/;
   $trimmedtext = $prnfilename; $trimmedtext =~ s/\.prn/_trimmed\.txt/;
@@ -28,12 +28,14 @@ foreach $prnfile(@ARGV){
   $finalout = $samplename."_corrected.csv" ;
   open(PRNFILE,$prnfilename);
   open(TXTFILE,">>$txtfilename");
+  # Convert .prn file into a .txt file by removing Windows carriage returns
   while(<PRNFILE>){ s/\r/\n/g; print TXTFILE; }
   close(TXTFILE);
   close(PRNFILE);
   open(TXTFILE,$txtfilename);
   open(TRIMMEDTXT, ">>$trimmedtext");
   my $flag = 0;
+  # Further parsing of .prn file to just provide Wavenumber and Intensity
   while(<TXTFILE>){
     if(/Crypto/){ $flag = 1; }
     if(($flag == 1) && ($_ !~ /CryptoSignature/)){ print TRIMMEDTXT; }
@@ -41,12 +43,14 @@ foreach $prnfile(@ARGV){
   close(TRIMMEDTXT);
   close(TXTFILE);
 
+  # Create spectrum-specific Octave/ Matlab script
   open(RUNOCTAVE,">$samplename.m");
   print RUNOCTAVE "addpath ./\n",
         "load $trimmedtext\n",
         "GoldindecQsub($samplename,4,0.5,0.0001,'./',\"$samplename\");";
   close(RUNOCTAVE);
 
+  # Create spectrum-specific queue submission (.qsub) script
   open(RUNQSUB,">$samplename.qsub");
   print RUNQSUB $qsub_bash;
   print RUNQSUB "#PBS -N spectrum$spectrum_num\n";
@@ -58,7 +62,7 @@ foreach $prnfile(@ARGV){
       "rm $samplename.csv $trimmedtext $baselineoutfile $txtfilename\n";
 
   close(RUNQSUB);
-
+  # Submit 
   system("qsub -d . $samplename.qsub");
   $spectrum_num++;
   if(($spectrum_num % 100) == 0){sleep 300;}
