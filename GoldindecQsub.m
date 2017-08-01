@@ -1,4 +1,4 @@
-function OPT_z=GoldindecQsub(A,p,peak_ratio,eps,path,whoami)
+function OPT_z=GoldindecQsub(A,p,peak_ratio,eps,path,file_in)
 y=A(:,2);
 n=A(:,1);
 %eps=0.0001;
@@ -35,7 +35,7 @@ y=y(i);
 Baseline=[A(:,1) OPT_z];
 %CUSTOMIZATION START
 %Modify the output path and filename
-outfile = strcat(whoami, ".csv")
+outfile = strcat(file_in, ".csv")
 path=fullfile(path, outfile)
 %Write out a tab-delimited file
 dlmwrite(path,Baseline)
