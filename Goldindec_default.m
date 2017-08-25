@@ -1,4 +1,4 @@
-function OPT_z=Goldindec(A,p,peak_ratio,eps,path,outname)
+function OPT_z=Goldindec(A,p,peak_ratio,eps,path)
 y=A(:,2);
 n=A(:,1);
 %eps=0.0001;
@@ -35,16 +35,11 @@ y=y(i);
 Baseline=[A(:,1) OPT_z];
 %CUSTOMIZATION START
 %Modify the output path and filename
-outfile = strjoin({outname,".tsv"}, "")
-path = fullfile(path,outfile)
+path=fullfile(path,'output.csv')
 %Write out a tab-delimited file
 dlmwrite(path,Baseline)
-% OR, alternatively, write it out as Excel file by uncommenting the line below;
-% Just change the extension in the "outfile" assignment above from "tsv" to "xlsx"
 %xlswrite(path,Baseline);
 %background=background(i);
 %CUSTOMIZATION END
-% The section below just plots the baseline on the original curve; uncomment if
-% this is needed
 OPT_z=OPT_z(i);
-plot(n,y,n,OPT_z)
+%plot(n,y,n,OPT_z)
